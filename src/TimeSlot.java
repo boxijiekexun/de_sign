@@ -4,8 +4,9 @@
  */
 public class TimeSlot {
     private final int startTime; // 小时数，例如：14 (2 PM)
-    private final int endTime;   // 小时数，例如：16 (4 PM)
+    private final int endTime; // 小时数，例如：16 (4 PM)
 
+    // 初始化--确保开始时间和结束时间
     public TimeSlot(int startTime, int endTime) {
         if (startTime >= endTime) {
             throw new IllegalArgumentException("结束时间必须晚于开始时间。");
@@ -14,10 +15,12 @@ public class TimeSlot {
         this.endTime = endTime;
     }
 
+    // 访问器--开始时间
     public int getStartTime() {
         return startTime;
     }
 
+    // 访问器--结束时间
     public int getEndTime() {
         return endTime;
     }
@@ -31,6 +34,7 @@ public class TimeSlot {
         return this.startTime < other.endTime && this.endTime > other.startTime;
     }
 
+    // 字符串表示---打印时间段信息
     @Override
     public String toString() {
         return String.format("[%02d:00 - %02d:00]", startTime, endTime);

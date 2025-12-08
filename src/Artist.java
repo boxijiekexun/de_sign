@@ -6,8 +6,8 @@ import java.util.Comparator;
  */
 public class Artist implements Comparable<Artist> {
     private final String name;
-    private final String genre; // 摇滚/流行/电子 [cite: 104]
-    private int popularity;     // 人气值 (越高越优先) [cite: 103]
+    private final String genre; // 摇滚/流行/电子 
+    private int popularity;     // 人气值 (越高越优先) 
 
     public Artist(String name, String genre, int popularity) {
         this.name = name;
