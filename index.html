@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherSwarm 音乐节时刻表</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* --- 全局样式：赛博朋克/暗黑音乐节风格 --- */
+        :root {
+            --primary-color: #00ff88;
+            --secondary-color: #00ccff;
+            --accent-color: #ff0055;
+            --card-width: 280px;
+            --card-height: 450px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #111;
+            /* 全局背景图：大型音乐节现场 */
+            background-image: url('https://images.unsplash.com/photo-1459749411177-d4a428c37ae5?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* 背景固定，营造视差感 */
+            height: 100vh;
+            overflow: hidden; /* 隐藏浏览器默认滚动条 */
+            display: flex;
+            flex-direction: column;
+            color: white;
+        }
+
+        /* 背景遮罩，让文字更清晰 */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.9));
+            z-index: 0;
+        }
+
+        /* --- 顶部标题栏 --- */
+        header {
+            position: relative;
+            z-index: 2;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        #status-indicator {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            box-shadow: 0 0 10px red;
+            transition: all 0.3s;
+        }
+        .dot.connected {
+            background-color: var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+
+        /* --- 核心容器：横向滚动卡片墙 --- */
+        #stage-container {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding: 0 50px;
+            overflow-x: auto; /* 允许横向滚动 */
+            gap: 40px;
+            scroll-behavior: smooth;
+            /* 隐藏滚动条但保留功能 */
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+        }
+        #stage-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* --- 艺人卡片设计 --- */
+        .artist-card {
+            flex: 0 0 var(--card-width);
+            height: var(--card-height);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: #222;
+        }
+
+        .artist-card:hover {
+            transform: scale(1.05) translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 255, 136, 0.3);
+            z-index: 10;
+        }
+
+        /* 卡片背景图 */
+        .card-bg {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: filter 0.3s;
+        }
+
+        .artist-card:hover .card-bg {
+            filter: brightness(1.1);
+        }
+
+        /* 卡片内容层 (玻璃拟态) */
+        .card-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0));
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .time-badge {
+            display: inline-block;
+            background: var(--accent-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            width: fit-content;
+            margin-bottom: 5px;
+        }
+
+        .artist-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .genre {
+            color: #aaa;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .popularity-bar {
+            margin-top: 10px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .popularity-fill {
+            height: 100%;
+            background: var(--primary-color);
+        }
+
+        /* --- 播放按钮 --- */
+        .play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+            border: 2px solid white;
+            transition: all 0.3s;
+            opacity: 0;
+        }
+
+        .artist-card:hover .play-btn {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .play-btn:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: black;
+        }
+
+        /* 正在播放时的动画效果 */
+        .artist-card.playing {
+            border: 2px solid var(--primary-color);
+        }
+        .artist-card.playing .play-btn {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        /* --- 页脚提示 --- */
+        .footer-hint {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            z-index: 2;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+            pointer-events: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="overlay"></div>
+
+    <header>
+        <h1>AetherSwarm Festival 2025</h1>
+        <div id="status-indicator">
+            <div class="dot" id="ws-dot"></div>
+            <span id="ws-text">正在连接服务器...</span>
+        </div>
+    </header>
+
+    <div id="stage-container">
+        <div style="color: #666; font-size: 1.2rem; margin-left: 20px;">
+            <i class="fas fa-spinner fa-spin"></i> 等待调度中心数据...
+        </div>
+    </div>
+
+    <div class="footer-hint">
+        <i class="fas fa-arrow-right"></i> 使用鼠标滚轮或触摸滑动查看更多艺人
+    </div>
+
+    <audio id="global-audio"></audio>
+
+    <script>
+        const WS_PORT = 8080;
+        const container = document.getElementById('stage-container');
+        const wsDot = document.getElementById('ws-dot');
+        const wsText = document.getElementById('ws-text');
+        const audioPlayer = document.getElementById('global-audio');
+        let currentPlayingCard = null;
+
+        // WebSocket 连接
+        function connectWebSocket() {
+            const ws = new WebSocket(`ws://localhost:${WS_PORT}`);
+
+            ws.onopen = () => {
+                wsDot.classList.add('connected');
+                wsText.innerText = "实时调度已连接";
+                wsText.style.color = "#00ff88";
+            };
+
+            ws.onclose = () => {
+                wsDot.classList.remove('connected');
+                wsText.innerText = "服务器断开，尝试重连...";
+                wsText.style.color = "red";
+                setTimeout(connectWebSocket, 3000);
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    renderCards(data);
+                } catch (e) {
+                    console.error("数据解析失败", e);
+                }
+            };
+        }
+
+        // 渲染卡片核心逻辑
+        function renderCards(performances) {
+            container.innerHTML = ''; // 清空现有内容
+
+            performances.forEach((p, index) => {
+                // 创建卡片元素
+                const card = document.createElement('div');
+                card.className = 'artist-card';
+                // 添加交错动画延迟
+                card.style.animation = `fadeInUp 0.5s ease forwards ${index * 0.1}s`;
+
+                // 注入 HTML 内容
+                card.innerHTML = `
+                    <div class="card-bg" style="background-image: url('${p.posterImage}')"></div>
+                    <div class="play-btn"><i class="fas fa-play"></i></div>
+                    <div class="card-content">
+                        <span class="time-badge">${p.startTime}:00 - ${p.endTime}:00</span>
+                        <h2 class="artist-name">${p.artist}</h2>
+                        <div class="genre">${p.genre}</div>
+                        <div class="popularity-bar">
+                            <div class="popularity-fill" style="width: ${Math.min(p.popularity, 100)}%"></div>
+                        </div>
+                    </div>
+                `;
+
+                // 点击播放逻辑
+                card.addEventListener('click', () => {
+                    togglePlay(card, p.audioUrl);
+                });
+
+                container.appendChild(card);
+            });
+        }
+
+        // 音频播放控制
+        function togglePlay(card, url) {
+            const icon = card.querySelector('.play-btn i');
+
+            // 如果点击的是正在播放的卡片 -> 暂停
+            if (currentPlayingCard === card && !audioPlayer.paused) {
+                audioPlayer.pause();
+                card.classList.remove('playing');
+                icon.className = 'fas fa-play';
+                currentPlayingCard = null;
+            } 
+            // 如果点击的是新卡片 -> 播放
+            else {
+                // 重置之前的卡片状态
+                if (currentPlayingCard) {
+                    currentPlayingCard.classList.remove('playing');
+                    currentPlayingCard.querySelector('.play-btn i').className = 'fas fa-play';
+                }
+
+                // 更新当前卡片状态
+                audioPlayer.src = url;
+                audioPlayer.play();
+                card.classList.add('playing');
+                icon.className = 'fas fa-pause'; // 切换图标为暂停
+                currentPlayingCard = card;
+            }
+        }
+
+        // 支持鼠标滚轮横向滚动
+        container.addEventListener('wheel', (evt) => {
+            evt.preventDefault();
+            container.scrollLeft += evt.deltaY;
+        });
+
+        // 启动
+        connectWebSocket();
+
+    </script>
+</body>
+</html>
