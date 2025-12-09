@@ -153,21 +153,52 @@ public class MusicFestivalScheduler {
             data.put("endTime", p.getTimeSlot().getEndTime());
             data.put("popularity", p.getArtist().getPopularity());
             
-            // --- 【新增】前端展示素材注入 ---
+            // --- 【新增】代表作和海报信息注入 ---
+            String artistName = p.getArtist().getName();
+            String songTitle = "未知代表作";
+            String imageKeyword = ""; // 用于 AI 搜索图片的关键词
+            String audioUrl = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"; // 通用测试音频
             
-            // 1. 根据风格分配随机海报背景图 (使用 Unsplash 关键词)
-            String genreKeyword = "music";
-            if (p.getArtist().getGenre().equals("摇滚")) genreKeyword = "rock-concert";
-            else if (p.getArtist().getGenre().equals("流行")) genreKeyword = "pop-singer";
-            else if (p.getArtist().getGenre().equals("电子")) genreKeyword = "dj-party";
+            // 根据艺人分配代表作和图片关键词
+            switch (artistName) {
+                case "Beyond":
+                    songTitle = "海阔天空";
+                    imageKeyword = "Beyond Band Concert"; // 搜索 Beyond 乐队演唱会
+                    break;
+                case "周杰伦":
+                    songTitle = "七里香";
+                    imageKeyword = "Jay Chou Concert"; // 搜索 周杰伦演唱会
+                    break;
+                case "泰勒斯威夫特":
+                    songTitle = "Love Story";
+                    imageKeyword = "Taylor Swift Eras Tour"; // 搜索 泰勒斯威夫特
+                    break;
+                case "方大同":
+                    songTitle = "爱爱爱";
+                    imageKeyword = "Khalil Fong singing";
+                    break;
+                case "林俊杰":
+                    songTitle = "江南";
+                    imageKeyword = "JJ Lin Concert";
+                    break;
+                case "韩红":
+                    songTitle = "天路";
+                    imageKeyword = "Han Hong singer stage";
+                    break;
+                case "陶喆":
+                    songTitle = "爱很简单";
+                    imageKeyword = "David Tao concert";
+                    break;
+                default:
+                    imageKeyword = p.getArtist().getGenre() + " Music Festival";
+                    break;
+            }
             
-            // 这里使用 picsum 或 source.unsplash 作为占位图，实际项目中应存储真实 URL
-            // 为了演示效果，我们使用带关键词的随机图接口
-            data.put("posterImage", "https://source.unsplash.com/400x600/?" + genreKeyword + "&sig=" + p.getArtist().getName().hashCode());
-
-            // 2. 注入模拟音频链接 (这里用一个免费的测试音频代替)
-            // 在实际项目中，这里应该是 p.getArtist().getSongUrl()
-            data.put("audioUrl", "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+            data.put("songTitle", songTitle);
+            data.put("audioUrl", audioUrl); // 使用通用测试音频
+            
+            // 自动搜索图片 (使用 Unsplash 随机图服务，加入关键词和哈希值保证变化)
+            data.put("posterImage", "https://source.unsplash.com/400x600/?" + imageKeyword.replace(" ", "-") + "&sig=" + artistName.hashCode());
 
             visualData.add(data);
         }
