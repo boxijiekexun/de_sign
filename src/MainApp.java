@@ -22,30 +22,41 @@ public class MainApp {
 
     public static void main(String[] args) {
         // 1. 初始化调度器 (启动 WebSocket 端口 8080)
-        System.out.println(">>> 系统启动中...");
-        MusicFestivalScheduler scheduler = new MusicFestivalScheduler(8080);
-        
-        System.out.println("\n🌐 提示: 请在浏览器打开 index.html 查看 3D 可视化效果。\n");
+    System.out.println(">>> 系统启动中...");
+    MusicFestivalScheduler scheduler = new MusicFestivalScheduler(8080);
+    
+    System.out.println("\n🌐 提示: 请在浏览器打开 index.html 查看 3D 可视化效果。\n");
 
-        // --- 2. 数据录入 ---
+    // --- 2. 数据录入：使用新艺人列表 ---
 
-        // 定义艺人
-        Artist artistA = new Artist("RockStar", "摇滚", 95);
-        Artist artistB = new Artist("PopQueen", "流行", 100); 
-        Artist artistC = new Artist("DJ_Elec", "电子", 80);
-        Artist artistD = new Artist("IndieBoy", "流行", 70);
+    // 定义艺人 (Name, Genre, Popularity)
+    // 风格关键词将用于前端图片搜索
+    Artist artistA = new Artist("Beyond", "摇滚", 98);      // 摇滚 (Rock)
+    Artist artistB = new Artist("周杰伦", "流行/R&B", 100);  // 流行/R&B (Pop/R&B)
+    Artist artistC = new Artist("泰勒斯威夫特", "流行", 95);  // 流行 (Pop)
+    Artist artistD = new Artist("方大同", "R&B/灵魂乐", 85); // R&B/灵魂乐 (Soul/R&B)
+    Artist artistE = new Artist("林俊杰", "流行/抒情", 93);   // 流行/抒情 (Pop Ballad)
+    Artist artistF = new Artist("韩红", "民歌/流行", 90);      // 民族/流行 (Folk Pop)
+    Artist artistG = new Artist("陶喆", "R&B/摇滚", 88);      // R&B/摇滚 (R&B/Rock)
+    
+    // 演出时间 (StartHour, EndHour)
+    // 我们将这些演出错开，避免冲突
+    TimeSlot slot1 = new TimeSlot(14, 16); // 14:00-16:00
+    TimeSlot slot2 = new TimeSlot(16, 17); // 16:00-17:00
+    TimeSlot slot3 = new TimeSlot(17, 18); // 17:00-18:00
+    TimeSlot slot4 = new TimeSlot(18, 20); // 18:00-20:00 (较长时段)
+    TimeSlot slot5 = new TimeSlot(20, 21); // 20:00-21:00
+    TimeSlot slot6 = new TimeSlot(21, 22); // 21:00-22:00
+    TimeSlot slot7 = new TimeSlot(22, 23); // 22:00-23:00
 
-        // 定义时间段
-        TimeSlot slot1 = new TimeSlot(14, 16); 
-        TimeSlot slot2 = new TimeSlot(16, 18); 
-        TimeSlot slot3 = new TimeSlot(18, 20); 
-        TimeSlot slot4 = new TimeSlot(20, 22); 
-
-        // 录入演出
-        scheduler.addPerformance(artistA, slot1); 
-        scheduler.addPerformance(artistC, slot2); 
-        scheduler.addPerformance(artistB, slot4); 
-        scheduler.addPerformance(artistD, slot3); 
+    // 录入演出，注意排期
+    scheduler.addPerformance(artistA, slot1); // Beyond (摇滚)
+    scheduler.addPerformance(artistG, slot2); // 陶喆 (R&B/摇滚)
+    scheduler.addPerformance(artistF, slot3); // 韩红 (民歌/流行)
+    scheduler.addPerformance(artistB, slot4); // 周杰伦 (顶流，长时段)
+    scheduler.addPerformance(artistC, slot5); // 泰勒斯威夫特 (流行)
+    scheduler.addPerformance(artistE, slot6); // 林俊杰 (流行/抒情)
+    scheduler.addPerformance(artistD, slot7); // 方大同 (R&B/灵魂乐)
 
         // --- 3. 冲突检测演示 ---
         System.out.println("\n--- ⚠️ 冲突检测演示 ---");
