@@ -198,7 +198,7 @@ public class MusicFestivalScheduler {
             data.put("audioUrl", audioUrl); // 使用通用测试音频
             
             // 自动搜索图片 (使用 Unsplash 随机图服务，加入关键词和哈希值保证变化)
-            data.put("posterImage", "https://source.unsplash.com/400x600/?" + imageKeyword.replace(" ", "-") + "&sig=" + artistName.hashCode());
+           data.put("posterImage", "https://loremflickr.com/400" + imageKeyword.replace(" ", "-") + "&sig=" + artistName.hashCode());
 
             visualData.add(data);
         }
