@@ -311,7 +311,6 @@
             };
         }
 
-        // 渲染卡片核心逻辑
         function renderCards(performances) {
             container.innerHTML = ''; // 清空现有内容
 
@@ -325,11 +324,11 @@
                 // 注入 HTML 内容
                 card.innerHTML = `
                     <div class="card-bg" style="background-image: url('${p.posterImage}')"></div>
-                    <div class="play-btn"><i class="fas fa-play"></i></div>
+                    <div class="play-btn" title="播放: ${p.songTitle}"><i class="fas fa-play"></i></div>
                     <div class="card-content">
                         <span class="time-badge">${p.startTime}:00 - ${p.endTime}:00</span>
                         <h2 class="artist-name">${p.artist}</h2>
-                        <div class="genre">${p.genre}</div>
+                        <div class="genre">${p.genre} - ${p.songTitle}</div>
                         <div class="popularity-bar">
                             <div class="popularity-fill" style="width: ${Math.min(p.popularity, 100)}%"></div>
                         </div>
@@ -337,16 +336,17 @@
                 `;
 
                 // 点击播放逻辑
+                // 传入 songTitle 用于显示，传入 audioUrl 用于播放
                 card.addEventListener('click', () => {
-                    togglePlay(card, p.audioUrl);
+                    togglePlay(card, p.audioUrl, p.songTitle);
                 });
 
                 container.appendChild(card);
             });
         }
 
-        // 音频播放控制
-        function togglePlay(card, url) {
+        // 音频播放控制 (修改：增加 songTitle 参数)
+        function togglePlay(card, url, songTitle) {
             const icon = card.querySelector('.play-btn i');
 
             // 如果点击的是正在播放的卡片 -> 暂停
@@ -355,6 +355,7 @@
                 card.classList.remove('playing');
                 icon.className = 'fas fa-play';
                 currentPlayingCard = null;
+                console.log(`[播放器] 暂停播放：${songTitle}`);
             } 
             // 如果点击的是新卡片 -> 播放
             else {
@@ -370,6 +371,7 @@
                 card.classList.add('playing');
                 icon.className = 'fas fa-pause'; // 切换图标为暂停
                 currentPlayingCard = card;
+                console.log(`[播放器] 正在播放：${songTitle}`);
             }
         }
 
