@@ -152,6 +152,23 @@ public class MusicFestivalScheduler {
             data.put("startTime", p.getTimeSlot().getStartTime());
             data.put("endTime", p.getTimeSlot().getEndTime());
             data.put("popularity", p.getArtist().getPopularity());
+            
+            // --- 【新增】前端展示素材注入 ---
+            
+            // 1. 根据风格分配随机海报背景图 (使用 Unsplash 关键词)
+            String genreKeyword = "music";
+            if (p.getArtist().getGenre().equals("摇滚")) genreKeyword = "rock-concert";
+            else if (p.getArtist().getGenre().equals("流行")) genreKeyword = "pop-singer";
+            else if (p.getArtist().getGenre().equals("电子")) genreKeyword = "dj-party";
+            
+            // 这里使用 picsum 或 source.unsplash 作为占位图，实际项目中应存储真实 URL
+            // 为了演示效果，我们使用带关键词的随机图接口
+            data.put("posterImage", "https://source.unsplash.com/400x600/?" + genreKeyword + "&sig=" + p.getArtist().getName().hashCode());
+
+            // 2. 注入模拟音频链接 (这里用一个免费的测试音频代替)
+            // 在实际项目中，这里应该是 p.getArtist().getSongUrl()
+            data.put("audioUrl", "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+
             visualData.add(data);
         }
         return gson.toJson(visualData);
