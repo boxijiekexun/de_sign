@@ -2,7 +2,6 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-<<<<<<< HEAD
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AetherSwarm 音乐节时刻表</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -251,36 +250,10 @@
             100% { opacity: 0.5; }
         }
 
-=======
-    <title>音乐节调度系统 - 前端模拟</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; }
-        h1 { color: #333; }
-        #controls { margin-bottom: 20px; padding: 15px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        #schedule-container { display: flex; flex-wrap: wrap; gap: 20px; }
-        .artist-card { 
-            background-color: #fff; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15); 
-            width: 300px; 
-            overflow: hidden; 
-            transition: transform 0.2s;
-        }
-        .artist-card:hover { transform: translateY(-5px); }
-        .artist-card img { width: 100%; height: 300px; object-fit: cover; }
-        .card-content { padding: 15px; }
-        .card-content h3 { margin-top: 0; color: #007bff; }
-        .time-slot { background-color: #e9ecef; padding: 5px; border-radius: 4px; display: inline-block; font-size: 0.9em; margin-bottom: 10px; }
-        .audio-player { width: 100%; margin-top: 10px; }
-        .sort-button { padding: 10px 15px; margin-right: 10px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 5px; }
-        .sort-button:hover { background-color: #218838; }
-        .sort-button.active { background-color: #0056b3; }
->>>>>>> 4c71e7f1cc431fbe5964666397f0405fbcac0b2a
     </style>
 </head>
 <body>
 
-<<<<<<< HEAD
     <div class="overlay"></div>
 
     <header>
@@ -311,9 +284,17 @@
         const audioPlayer = document.getElementById('global-audio');
         let currentPlayingCard = null;
 
-        // WebSocket 连接
+       // WebSocket 连接
         function connectWebSocket() {
-            const ws = new WebSocket(`ws://localhost:${WS_PORT}`);
+            let protocol = 'ws:';
+            // 如果页面是通过 HTTPS (ngrok) 访问的，则使用 WSS 安全协议
+            if (window.location.protocol === 'https:') {
+                protocol = 'wss:';
+            }
+            
+            // 【核心修改】使用当前的公网主机地址和端口建立 WebSocket 连接
+            const wsUrl = `${protocol}//${window.location.host}`;
+            const ws = new WebSocket(wsUrl);
 
             ws.onopen = () => {
                 wsDot.classList.add('connected');
@@ -321,6 +302,8 @@
                 wsText.style.color = "#00ff88";
             };
 
+            // ... (onclose, onmessage, onerror 保持不变)
+            
             ws.onclose = () => {
                 wsDot.classList.remove('connected');
                 wsText.innerText = "服务器断开，尝试重连...";
@@ -412,115 +395,5 @@
         connectWebSocket();
 
     </script>
-=======
-    <h1>🎤 音乐节演出时间表</h1>
-
-    <div id="controls">
-        <label>排序方式：</label>
-        <button class="sort-button active" onclick="sortPerformances('startTime')">按时间排序</button>
-        <button class="sort-button" onclick="sortPerformances('popularity')">按人气排序</button>
-    </div>
-
-    <div id="schedule-container">
-        <p id="loading-message">正在连接到后端调度系统 (ws://localhost:8080)...</p>
-    </div>
-
-    <script>
-        const websocket = new WebSocket("ws://localhost:8080");
-        const scheduleContainer = document.getElementById('schedule-container');
-        let currentScheduleData = [];
-        let currentSortKey = 'startTime';
-
-        websocket.onopen = () => {
-            document.getElementById('loading-message').textContent = '✅ 已连接到调度系统，正在接收数据...';
-            console.log("WebSocket 连接成功！");
-        };
-
-        websocket.onmessage = (event) => {
-            document.getElementById('loading-message').style.display = 'none';
-            try {
-                // 1. 接收和解析 JSON 数据
-                const data = JSON.parse(event.data);
-                currentScheduleData = data;
-                console.log("接收到新的演出数据:", currentScheduleData);
-                
-                // 2. 接收到新数据后，重新渲染并保持当前排序
-                renderPerformances(currentSortKey); 
-            } catch (e) {
-                console.error("解析 JSON 数据失败:", e);
-            }
-        };
-
-        websocket.onclose = () => {
-            document.getElementById('loading-message').textContent = '❌ 连接断开。请检查 Java 后端是否运行。';
-            console.log("WebSocket 连接断开。");
-        };
-
-        websocket.onerror = (error) => {
-            console.error("WebSocket 错误:", error);
-            document.getElementById('loading-message').textContent = '⚠️ 连接错误。请检查端口和网络。';
-        };
-
-        // --- 排序逻辑 ---
-        function sortPerformances(key) {
-            currentSortKey = key;
-            
-            // 切换按钮的激活状态
-            document.querySelectorAll('.sort-button').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            // 3. 实现排序逻辑
-            currentScheduleData.sort((a, b) => {
-                if (key === 'startTime') {
-                    // 时间：升序排列
-                    return a.startTime - b.startTime;
-                } else if (key === 'popularity') {
-                    // 人气：降序排列 (人气越高，排在前面)
-                    return b.popularity - a.popularity;
-                }
-            });
-
-            // 重新渲染
-            renderPerformances(key);
-        }
-
-        // --- 渲染逻辑 ---
-        function renderPerformances() {
-            scheduleContainer.innerHTML = '';
-            
-            if (currentScheduleData.length === 0) {
-                scheduleContainer.innerHTML = '<p>暂无演出数据。</p>';
-                return;
-            }
-
-            currentScheduleData.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'artist-card';
-
-                // 4. 显示真人海报 (imageUrl)
-                const timeStr = `${String(p.startTime).padStart(2, '0')}:00 - ${String(p.endTime).padStart(2, '0')}:00`;
-                
-                card.innerHTML = `
-                    <img src="${p.imageUrl}" alt="${p.artist} 的海报">
-                    <div class="card-content">
-                        <h3>${p.artist} (${p.genre})</h3>
-                        <div class="time-slot">${timeStr}</div>
-                        <p>人气值: <strong>${p.popularity}</strong></p>
-                        
-                        <label>代表作试听:</label>
-                        <audio controls class="audio-player" src="${p.masterpieceUrl}">
-                            您的浏览器不支持 audio 元素。
-                        </audio>
-                    </div>
-                `;
-                scheduleContainer.appendChild(card);
-            });
-        }
-
-        // 初始化时，按时间排序
-        // renderPerformances('startTime'); // 第一次数据由 WebSocket onmessage 接收时触发
-    </script>
-
->>>>>>> 4c71e7f1cc431fbe5964666397f0405fbcac0b2a
 </body>
 </html>
