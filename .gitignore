@@ -1,1 +1,16 @@
-out/
+# 1. 新建 .gitignore 文件（PowerShell 命令）
+New-Item .gitignore -ItemType File
+
+# 2. 往 .gitignore 里写入忽略规则（覆盖写入，若已有文件用 Add-Content）
+Set-Content .gitignore @'
+# 忽略 VS Code 配置目录
+.vscode/
+
+# 忽略 Java/Maven/Gradle 构建产物目录
+target/
+
+# 可选：补充其他常见忽略项（如 IDEA 配置、临时文件等）
+# .idea/
+# *.log
+# out/
+'@
