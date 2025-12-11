@@ -115,13 +115,10 @@ public class MusicFestivalScheduler {
 
     // --- 可视化与广播功能 ---
 
-    /**
-<<<<<<< HEAD
+    /** 
      * 生成当前状态的 JSON 字符串
      * 【最终版】：注入本地资源路径，确保稳定和代表作唯一性。
-=======
-     * 生成当前状态的 JSON 字符串 (包含图片和音乐 URL)
->>>>>>> 4c71e7f1cc431fbe5964666397f0405fbcac0b2a
+
      */
     public String generateCurrentStateJson() {
         List<Performance> currentPerformances = timeline.getTimeline();
@@ -136,7 +133,6 @@ public class MusicFestivalScheduler {
             data.put("startTime", p.getTimeSlot().getStartTime());
             data.put("endTime", p.getTimeSlot().getEndTime());
             data.put("popularity", p.getArtist().getPopularity());
-<<<<<<< HEAD
             
             // --- 【核心修改】本地资源路径注入 ---
             String artistName = p.getArtist().getName();
@@ -188,12 +184,6 @@ public class MusicFestivalScheduler {
             data.put("audioUrl", "assets/audio/" + audioFileName);
             data.put("posterImage", "assets/images/" + imageFileName);
 
-=======
-            // 【新增】海报图片 URL
-            data.put("imageUrl", p.getArtist().getImageUrl()); 
-            // 【新增】代表作音乐 URL
-            data.put("masterpieceUrl", p.getArtist().getMasterpieceUrl()); 
->>>>>>> 4c71e7f1cc431fbe5964666397f0405fbcac0b2a
             visualData.add(data);
         }
         return gson.toJson(visualData);

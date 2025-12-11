@@ -2,24 +2,27 @@ import java.util.Comparator;
 
 /**
  * Artist.java
- * 艺人实体类，增加了代表作和图片 URL 字段。
+ * 艺人实体类，实现了 Comparable 接口，并添加了资源路径字段。
  */
 public class Artist implements Comparable<Artist> {
     private final String name;
-    private final String genre; // 摇滚/流行/电子 
-    private int popularity;     // 人气值 (越高越优先) 
-    private final String masterpieceUrl; // 代表作音乐链接
-    private final String imageUrl; // 海报图片链接
+    private final String genre; 
+    private int popularity;
+    
+    // 【新增字段】用于存储本地资源路径
+    private final String posterPath; 
+    private final String audioPath;  
 
-    // 【修改】构造函数，增加新的字段
-    public Artist(String name, String genre, int popularity, String masterpieceUrl, String imageUrl) {
+    // 【修改构造函数】接受五个参数
+    public Artist(String name, String genre, int popularity, String posterPath, String audioPath) {
         this.name = name;
         this.genre = genre;
         this.popularity = popularity;
-        this.masterpieceUrl = masterpieceUrl; 
-        this.imageUrl = imageUrl;             
+        this.posterPath = posterPath;
+        this.audioPath = audioPath;
     }
 
+    // --- Getters ---
     public String getName() {
         return name;
     }
@@ -31,24 +34,23 @@ public class Artist implements Comparable<Artist> {
     public int getPopularity() {
         return popularity;
     }
+    
+    // 【新增 Getter】
+    public String getPosterPath() {
+        return posterPath;
+    }
+    
+    // 【新增 Getter】
+    public String getAudioPath() {
+        return audioPath;
+    }
 
-    // 设置人气值
     public void setPopularity(int popularity) {
         this.popularity = popularity;
     }
-    
-    // 访问器--代表作 URL
-    public String getMasterpieceUrl() {
-        return masterpieceUrl;
-    }
-
-    // 访问器--图片 URL
-    public String getImageUrl() {
-        return imageUrl;
-    }
 
     /**
-     * 实现 compareTo 方法，用于 PriorityQueue (Max Heap)。
+     * 实现 compareTo 方法，用于 PriorityQueue。
      */
     @Override
     public int compareTo(Artist other) {
@@ -60,6 +62,9 @@ public class Artist implements Comparable<Artist> {
         return String.format("%s (%s, 人气: %d)", name, genre, popularity);
     }
 
+    /**
+     * 用于创建 Max Heap 的 Comparator。
+     */
     public static Comparator<Artist> popularityComparator() {
         return (a1, a2) -> a2.popularity - a1.popularity;
     }
