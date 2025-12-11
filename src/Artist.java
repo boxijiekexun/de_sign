@@ -32,16 +32,17 @@ public class Artist implements Comparable<Artist> {
         return popularity;
     }
 
+    // 设置人气值
     public void setPopularity(int popularity) {
         this.popularity = popularity;
     }
     
-    // 【新增】访问器--代表作 URL
+    // 访问器--代表作 URL
     public String getMasterpieceUrl() {
         return masterpieceUrl;
     }
 
-    // 【新增】访问器--图片 URL
+    // 访问器--图片 URL
     public String getImageUrl() {
         return imageUrl;
     }
