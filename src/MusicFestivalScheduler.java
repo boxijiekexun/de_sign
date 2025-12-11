@@ -138,6 +138,7 @@ public class MusicFestivalScheduler {
 
     /**
      * 生成当前状态的 JSON 字符串
+     * 【最终版】：注入本地资源路径，确保稳定和代表作唯一性。
      */
     public String generateCurrentStateJson() {
         List<Performance> currentPerformances = timeline.getTimeline();
@@ -153,52 +154,55 @@ public class MusicFestivalScheduler {
             data.put("endTime", p.getTimeSlot().getEndTime());
             data.put("popularity", p.getArtist().getPopularity());
             
-            // --- 【新增】代表作和海报信息注入 ---
+            // --- 【核心修改】本地资源路径注入 ---
             String artistName = p.getArtist().getName();
             String songTitle = "未知代表作";
-            String imageKeyword = ""; // 用于 AI 搜索图片的关键词
-            String audioUrl = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"; // 通用测试音频
+            String audioFileName = "default_audio.mp3"; 
+            String imageFileName = "default_poster.jpg"; 
             
-            // 根据艺人分配代表作和图片关键词
             switch (artistName) {
                 case "Beyond":
                     songTitle = "海阔天空";
-                    imageKeyword = "Beyond Band Concert"; // 搜索 Beyond 乐队演唱会
+                    audioFileName = "Beyond_HaKu.mp3";
+                    imageFileName = "Beyond_poster.jpg";
                     break;
                 case "周杰伦":
                     songTitle = "七里香";
-                    imageKeyword = "Jay Chou Concert"; // 搜索 周杰伦演唱会
+                    audioFileName = "JayChou_Qilixiang.mp3";
+                    imageFileName = "JayChou_poster.jpg";
                     break;
                 case "泰勒斯威夫特":
                     songTitle = "Love Story";
-                    imageKeyword = "Taylor Swift Eras Tour"; // 搜索 泰勒斯威夫特
+                    audioFileName = "Taylor_LoveStory.mp3";
+                    imageFileName = "Taylor_poster.jpg";
                     break;
                 case "方大同":
                     songTitle = "爱爱爱";
-                    imageKeyword = "Khalil Fong singing";
+                    audioFileName = "Khalil_AiAiAi.mp3";
+                    imageFileName = "Khalil_poster.jpg";
                     break;
                 case "林俊杰":
                     songTitle = "江南";
-                    imageKeyword = "JJ Lin Concert";
+                    audioFileName = "JJLin_JiangNan.mp3";
+                    imageFileName = "JJLin_poster.jpg";
                     break;
                 case "韩红":
                     songTitle = "天路";
-                    imageKeyword = "Han Hong singer stage";
+                    audioFileName = "HanHong_TianLu.mp3";
+                    imageFileName = "HanHong_poster.jpg";
                     break;
                 case "陶喆":
                     songTitle = "爱很简单";
-                    imageKeyword = "David Tao concert";
-                    break;
-                default:
-                    imageKeyword = p.getArtist().getGenre() + " Music Festival";
+                    audioFileName = "DavidTao_AiHenJianDan.mp3";
+                    imageFileName = "DavidTao_poster.jpg";
                     break;
             }
             
             data.put("songTitle", songTitle);
-            data.put("audioUrl", audioUrl); // 使用通用测试音频
             
-            // 自动搜索图片 (使用 Unsplash 随机图服务，加入关键词和哈希值保证变化)
-           data.put("posterImage", "https://loremflickr.com/400" + imageKeyword.replace(" ", "-") + "&sig=" + artistName.hashCode());
+            // 注入本地相对路径：index.html 将使用这些路径
+            data.put("audioUrl", "assets/audio/" + audioFileName);
+            data.put("posterImage", "assets/images/" + imageFileName);
 
             visualData.add(data);
         }
