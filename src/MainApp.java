@@ -22,6 +22,7 @@ public class MainApp {
 
     public static void main(String[] args) {
         // 1. 初始化调度器 (启动 WebSocket 端口 8080)
+<<<<<<< HEAD
     System.out.println(">>> 系统启动中...");
     MusicFestivalScheduler scheduler = new MusicFestivalScheduler(8080);
     
@@ -57,10 +58,53 @@ public class MainApp {
     scheduler.addPerformance(artistC, slot5); // 泰勒斯威夫特 (流行)
     scheduler.addPerformance(artistE, slot6); // 林俊杰 (流行/抒情)
     scheduler.addPerformance(artistD, slot7); // 方大同 (R&B/灵魂乐)
+=======
+        System.out.println(">>> 系统启动中...");
+        MusicFestivalScheduler scheduler = new MusicFestivalScheduler(8080);
+    
+        System.out.println("\n🌐 提示: 请在浏览器打开 index.html 查看可视化效果。\n");
+
+        // --- 2. 数据录入：使用新艺人列表 ---
+
+        // 定义艺人 (Name, Genre, Popularity, MasterpieceUrl, ImageUrl)
+        // ⚠️ 请替换以下 URL 为真实的资源链接！
+        Artist artistA = new Artist("Beyond", "摇滚", 98, 
+            "http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/thrust.mp3", "https://picsum.photos/id/1015/300/400");
+        Artist artistB = new Artist("周杰伦", "流行/R&B", 100, 
+            "http://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/player_shoot.wav", "https://picsum.photos/id/1025/300/400");
+        Artist artistC = new Artist("泰勒斯威夫特", "流行", 95, 
+            "http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/high_alarm.mp3", "https://picsum.photos/id/10/300/400");
+        Artist artistD = new Artist("方大同", "R&B/灵魂乐", 85,
+            "http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/thrust.mp3", "https://picsum.photos/id/1036/300/400");
+        Artist artistE = new Artist("林俊杰", "流行/抒情", 93,
+            "http://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/player_shoot.wav", "https://picsum.photos/id/1043/300/400");
+        Artist artistF = new Artist("韩红", "民歌/流行", 90,
+            "http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/high_alarm.mp3", "https://picsum.photos/id/1054/300/400");
+        Artist artistG = new Artist("陶喆", "R&B/摇滚", 88,
+            "http://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/player_shoot.wav", "https://picsum.photos/id/1066/300/400");
+        
+        // 演出时间 (StartHour, EndHour)
+        TimeSlot slot1 = new TimeSlot(14, 16); // 14:00-16:00
+        TimeSlot slot2 = new TimeSlot(16, 17); // 16:00-17:00
+        TimeSlot slot3 = new TimeSlot(17, 18); // 17:00-18:00
+        TimeSlot slot4 = new TimeSlot(18, 20); // 18:00-20:00 (顶流，长时段)
+        TimeSlot slot5 = new TimeSlot(20, 21); // 20:00-21:00
+        TimeSlot slot6 = new TimeSlot(21, 22); // 21:00-22:00
+        TimeSlot slot7 = new TimeSlot(22, 23); // 22:00-23:00
+
+        // 录入演出，注意排期
+        scheduler.addPerformance(artistA, slot1); // Beyond
+        scheduler.addPerformance(artistG, slot2); // 陶喆
+        scheduler.addPerformance(artistF, slot3); // 韩红
+        scheduler.addPerformance(artistB, slot4); // 周杰伦
+        scheduler.addPerformance(artistC, slot5); // 泰勒斯威夫特
+        scheduler.addPerformance(artistE, slot6); // 林俊杰
+        scheduler.addPerformance(artistD, slot7); // 方大同
+>>>>>>> 4c71e7f1cc431fbe5964666397f0405fbcac0b2a
 
         // --- 3. 冲突检测演示 ---
         System.out.println("\n--- ⚠️ 冲突检测演示 ---");
-        scheduler.addPerformance(new Artist("NewBand", "摇滚", 60), new TimeSlot(15, 17));
+        scheduler.addPerformance(new Artist("NewBand", "摇滚", 60, null, null), new TimeSlot(15, 17));
 
         printTimeline(scheduler.getTimeline());
 
