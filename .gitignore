@@ -10,7 +10,7 @@ Set-Content .gitignore @'
 target/
 
 # 可选：补充其他常见忽略项（如 IDEA 配置、临时文件等）
-# .idea/
-# *.log
-# out/
+.idea/
+*.log
+out/
 '@
