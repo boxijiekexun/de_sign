@@ -286,14 +286,25 @@
 
        // WebSocket 连接
         function connectWebSocket() {
-            let protocol = 'ws:';
-            // 如果页面是通过 HTTPS (ngrok) 访问的，则使用 WSS 安全协议
-            if (window.location.protocol === 'https:') {
-                protocol = 'wss:';
+            // 1. 尝试从 URL 参数中读取 ngrok 地址
+            // 格式: https://您的github页面/?host=xxxx.ngrok-free.dev
+            const urlParams = new URLSearchParams(window.location.search);
+            const remoteHost = urlParams.get('host');
+
+            let wsUrl;
+
+            if (remoteHost) {
+                // 如果 URL 里有 host 参数，说明是好友在访问，强制使用 WSS (安全 WebSocket)
+                // 自动去掉可能多余的 'https://' 前缀
+                const cleanHost = remoteHost.replace(/^https?:\/\//, '');
+                wsUrl = `wss://${cleanHost}`;
+                console.log("正在尝试连接远程服务器:", wsUrl);
+            } else {
+                // 如果没有参数，说明是您自己在本地打开，连接 localhost
+                wsUrl = `ws://localhost:${WS_PORT}`;
+                console.log("正在尝试连接本地服务器:", wsUrl);
             }
-            
-            // 【核心修改】使用当前的公网主机地址和端口建立 WebSocket 连接
-            const wsUrl = `${protocol}//${window.location.host}`;
+
             const ws = new WebSocket(wsUrl);
 
             ws.onopen = () => {
